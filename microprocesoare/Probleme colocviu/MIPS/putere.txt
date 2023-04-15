@@ -1,0 +1,66 @@
+.data
+msg1:
+	.asciiz "dati numarul N : "
+la_puterea:
+	.asciiz " la puterea "
+
+	.align 2
+N:
+	.space 4
+
+	.globl main  			
+	.text 
+main:
+
+	la $a0, msg1	      
+	li $v0, 4		   
+	syscall		       
+
+	li $v0, 5         
+	syscall
+
+	move $t0, $v0
+	li $t1, 2
+	li $t2, 1
+
+li $t3, 0
+loop:  
+	beq $t0, $t2, sfarsit
+	
+	div $t0,$t1
+	mfhi $t4
+		
+	beqz $t4, impartire
+	
+	bnez $t3, afisare
+	add $t1, $t1, 1
+	
+	
+	j loop
+impartire:
+	move $t6,$t1
+	add $t3,$t3,1
+	mflo $t5
+	move $t0,$t5
+	
+	j loop
+	
+afisare:	
+	move $a0, $t6
+	li $v0, 1
+	syscall
+	la $a0, la_puterea
+	li $v0, 4
+	syscall
+	move $a0, $t3
+	li $v0, 1
+	syscall
+	li $t3, 0
+	add $t1, $t1, 1
+	j loop
+	
+     
+sfarsit:
+li $v0, 10
+syscall
+	

@@ -1,0 +1,78 @@
+#Calculati suma a n nr intregi aflate in memorie la adresa 0x10010000
+#Afisati suma si scrieti-o in mem la adresa 0x10010030
+#Calculati media aritmetica, afisare cat si rest.
+
+.data 
+n:
+  .word 10
+  
+msg1:
+  .asciiz "Suma celor n numere este: "
+  
+msg2:
+  .asciiz "\nCatul: "
+  
+msg3:
+  .asciiz "\nRestul: "
+.text
+
+start:
+li $t0, 0x10010000
+li $t1, 0
+la $t2, n
+
+#calcul suma
+suma:
+lw $t3, ($t0)
+add $t1, $t1, $t3
+addi $t0, $t0, 4
+addi $t2, $t2, -1
+bgtz $t2, suma
+
+#afisare suma si scriere in memorie
+li$v0, 4     #afisare msg1
+la $a0, msg1 
+syscall 
+
+li $v0, 1    #afisare suma
+move $a0, $t1
+syscall
+
+li, $t0, 0x10010030
+sw $t1, ($t0)
+
+#------------------------------------------------------------------------------------------------
+
+#Media aritmetica a numerelor
+lw $t2, n
+div $t1, $t2
+
+li$v0, 4     #afisare msg2
+la $a0, msg2
+syscall 
+
+li $v0, 1    #afisare cat
+move $a0, LO
+syscall
+
+li$v0, 4     #afisare msg3
+la $a0, msg2
+syscall 
+
+li $v0, 1    #afisare rest
+move $a0, HI
+syscall
+
+done
+
+
+
+
+
+
+
+
+
+
+
+ 

@@ -1,0 +1,121 @@
+;Se citeste un sir de n nr naturale.
+;Det cate nr sunt pare pozitive si cate impare negative.
+
+;int n, v[100], ct_pare_poz=0, ct_impare_neg=0;
+;cin>> n;
+;for(int i=0; i<n, i++)
+;	cin>>v[i];
+;   if(v[i]<0) i--;
+;for(int i=0; i<n; i++)
+;	if(v[i]%2==0 && v[i]>=0)
+;		ct_pare_poz++;
+;	if(v[i]%2==1 && v[i]<0)
+;		ct_impare_neg++;
+; cout<<ct_pare_poz;
+; cout<<ct_impare_neg;
+
+; r1 = n
+; r2 = n
+; r3= i
+; r4= contor pare poz
+; r5= contor imp neg
+; r6=2
+;r7 = catul
+;r8 = restul
+
+.data
+Prompt:
+        .asciiz "Introduceti numarul de elemente: n= "
+Prompt1:
+        .asciiz "v[i]= "
+PrintfFormat1:
+		.asciiz "Pare pozitive= \n"
+PrintfFormat2:
+		.asciiz "Impare negative= \n"
+PrintfMesaj_err:
+		.asciiz "\nNumarul de elemente nu poate f negativ! Introduceti un nr pozitiv!\n"
+
+.align 2
+PrintfPar1:
+		.word PrintfFormat1
+PrintfValue1:
+		.space 4 
+PrintfPar2:
+		.word PrintfFormat2 
+PrintfValue2:
+		.space 4 		
+PrintfErr1:
+		.word PrintfMesaj_err 		
+		
+.text
+.global main
+
+main:
+addi r1, r0, Prompt 
+jal InputUnsigned   ; r1 retine elementul current al sirului
+sle r15, r1, r0		; r15=1 daca r1<=r0 (0 daca r e pozitiv, 1 daca e negativ) (sle=set less or equal)
+bnez r15, mesaj_err ; daca s-a tastat un numar negativ se afiseaza
+                    ; mesaj urmat de reluarea introducerii
+                    ; numarului de la tastatura
+addi r2, r1, 0		; r2 = preia numarul de elemente al sirului
+addi r3, r0, 0		; r3= i
+addi r4, r0, 0		; r4= contor pare poz
+addi r5, r0, 0		; r5= contor imp neg
+addi r6, r0, 2		; r6=2
+
+					
+loop:
+	addi r1, r0, Prompt1  ; începe citirea sirului element cu element
+	jal InputUnsigned     ; r1 = retine elementul curent al sirului
+
+	div r7, r1, r6      ;impartire, inmultire, scadere pt aflarea restului
+	mult r8, r6, r7
+	sub r9, r1, r6		;r9= n%2
+	
+	seq r15, r9, r0		;rest=0 r15=1
+	beqz r15, impar		;rest=1 nr impar
+	sge r15, r1, r0		;r15=1 daca v[i]>=0
+	bnez r15, par_poz
+	
+	subi r2, r2, 1   ; r2=r2 –1 decrementare contor elemente citite
+    bnez r2, loop    ; mai sunt elemente de citit de la tastatura ?
+	j afisare
+	
+impar:
+	sgt r15, r1, r0		;r15=1 daca v[i]>0
+	bnez r15, nu
+	addi r5, r5, 1		;ct_imp_neg ++
+nu:	
+	subi r2, r2, 1   ; r2=r2 –1 decrementare contor elemente citite
+    bnez r2, loop    ; mai sunt elemente de citit de la tastatura ?
+	j afisare
+
+par_poz:
+	addi r4, r4, 1		;ct_pare_poz
+	
+	subi r2, r2, 1   ; r2=r2 –1 decrementare contor elemente citite
+    bnez r2, loop    ; mai sunt elemente de citit de la tastatura ?
+	
+afisare:
+	sw PrintfValue1, r4 	; salvare parametrii afisare pentru maxim
+    addi r14, r0, PrintfPar1
+	trap 5 
+	
+	sw PrintfValue2, r5		; salvare parametrii afisare pentru minim
+	addi r14 ,r0, PrintfPar2
+	trap 5 
+	j gata
+	
+mesaj_err:
+	addi r14, r0, PrintfErr1
+	trap 5 					; afisare mesaj eroare n= negativ
+	j main 					; reluare introducere dimensiune sir
+	
+gata:
+	trap 0 					; incheiere program
+		
+		
+		
+		
+		
+		

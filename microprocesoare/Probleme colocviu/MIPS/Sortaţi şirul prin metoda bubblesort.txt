@@ -1,0 +1,114 @@
+#Să se citească un şir de numere întregi de la tastatură, a cărui dimensiune este citită tot de la
+#tastatură. Sortaţi şirul prin metoda “bubblesort”, memoraţi succesiv datele la adresa
+#0x10012000 şi afişaţi şirul sortat pe consolă.
+
+;   int a[100], n, i, k, t;
+;   cout<<"n="<<;
+;   cin>>n;
+;   for(i=0; i<n; i++)
+;		cin>>a[i];
+;   for(k=1; k<=n; k++)
+;      for(i=0; i<=n-1; i++)
+;           if(a[i]>a[i+1])
+;           {
+;              t=a[i];
+;              a[i]=a[i+1];
+;              a[i+1]=t;
+;           }
+
+.data 
+
+v:     .space 80
+d1:    .asciiz "Scrieti nr de elemente ale vectorului: "
+d2:    .asciiz "Scrieti un intreg:"
+d3:    .asciiz "Vectorul sortat este:"
+
+
+.text
+
+.globl main
+start: 
+li $v0, 4     #afisare mesaj d1 -load immediate
+la $a0, d1	  #load addres
+syscall
+
+li $v0, 5	   #citire de la tastatura
+syscall
+move $t0, $v0  #pun in t0 nr de elemente
+move $t1, $t0  # t1 - contor
+la $a1, v      #in a1 adresa vectorului
+
+et:
+li $v0, 4  #afisare mesajul d2
+la $a0, d2
+syscall
+
+li $v0, 5	# cin>>a[i]
+syscall
+
+sw $v0, ($a1)  		#stocam nr citite de la tastatura in vector
+add $a1, $a1, 4 	#i++
+sub $t1, $t1, 1 	#contor--
+beqz $t1, sortare   #contor=0 =>s-a citit tot sirul, trecem la sortare
+j et
+
+sortare:
+move $t1, $t0  #contor 1
+move $t2, $t0  #contor 2
+
+la $a1, v      	#a1=i=0
+la $a2, v		#a2=k=0
+add $a2, $a2, 4 #a2=k=1
+li $a3, 0
+
+et1:
+lw $t3, ($a1)   		#t3=a[i]
+lw $t4, ($a2)			#t4=a[i+1]
+bgt $t3, $t4, switch	#daca a[i]>a[i+] le interschimbam, altfel trecem pe poz urm in vector
+
+et3:
+add $a1, $a1, 4  #a1++
+add $a2, $a2, 4	 #a2++
+sub $t1, $t1, 1  #scadem contor
+bne $t1, 1, et1  #cat timp i<n
+
+beqz $a3, afisare #cand nu se mai face nici un switch tot sirul a fost sortat
+j sortare
+
+switch:
+li $a3, 1			#a3=1 - conditia de iesire din bucla de sortare
+move $a0, $t3		#t=a[i];            
+move $t3, $t4		#a[i]=a[i+1];
+move $t4, $a0		#a[i+1]=t;
+sw $t3, ($a1)		#salvarea valorilor interschimbate
+sw $t4, ($a2)		
+j et3
+
+afisare:
+la $a1, v
+et4:
+li $v0, 1			#print integer
+lw $a0, ($a1)		#syscall se apeleaza cu v0 si a0
+syscall
+
+move $t9, $a0
+li $a0, 32			#32=codul ascii space
+li $v0, 11			#v0=11 -> print char
+syscall
+
+move $a0, $t9
+add $a1, $a1, 4		#i++
+sub $t2 ,$t2, 1		#contor--
+beq $t2, 0, gata	#cand contor=0 s-au afisat toate numerele
+j et4
+
+gata:	
+li $v0, 10			#exit
+syscall
+
+
+
+
+
+
+

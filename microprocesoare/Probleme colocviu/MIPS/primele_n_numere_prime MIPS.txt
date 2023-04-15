@@ -1,0 +1,40 @@
+.data
+citire:
+		.asciiz"\ndati numarul de numere prime dorit: "
+spatiu:
+		.asciiz"    "			
+.text
+		la $a0,citire
+		li $v0,4
+		syscall
+		#puts citire
+		li $t6,0
+		li $v0,5
+		syscall
+			move $a1,$v0           # $a1<----nr  de  numere  prime
+			li $t0,2
+		
+		generare:
+		div $t1,$t0,2         # t1<-- jumate din posibilul nr prim
+		beq $t1,1,e_prim					
+		li $t2,2
+								
+		testare_prim:
+		div $t0,$t2   
+		mfhi $t3          # $t3<---rest
+		beq $t3,0,increment		
+		add $t2,$t2,1
+		bgt $t1,$t2,testare_prim
+					
+		e_prim:
+		puti $t0
+		puts spatiu
+		add $t6,$t6,1	
+		increment:	
+		add $t0,$t0,1	
+		bgt $a1,$t6,generare
+		
+		
+		SFARSIT:
+		li $v0,10
+		syscall					

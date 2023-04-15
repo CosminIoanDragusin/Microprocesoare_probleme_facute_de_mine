@@ -1,0 +1,51 @@
+#Divizorii unui nr
+
+#int n;
+#cin >> n;
+#for(int d =1 ; d <= n ; d ++ )
+#    if(n % d == 0)
+#        cout << d << " ";
+
+.data
+n:
+.asciiz "Dati numarul: "
+spatiu:
+.asciiz " "
+
+.text
+start:
+li $v0,4		#afisare mesaj
+la $a0,n
+syscall
+
+li $v0,5		#v0=n
+syscall
+
+move $t0, $v0 	#t0=n
+li $t1, 1		#t1=d=1
+
+inceput:
+  beq $t1, $t0, sf		#daca n=d sari la sf
+  div $t0, $t1			#altfel n/d 
+  mfhi $t2				#t2=HI, in HI este depus restul impartirii de mai sus
+  beqz $t2, afisare		#if n%d==0 afiseaza divizor
+  addi $t1, $t1, 1		#d++
+  j inceput
+ 
+afisare:
+  li $v0, 1				#print integer
+  move $a0, $t1
+  syscall
+  
+  li $v0, 4				#print string
+  la $a0, spatiu
+  syscall
+  
+  addi $t1, $t1, 1		#d++
+  j inceput
+  
+sf:
+li $v0, 10				#exit
+syscall
+
+

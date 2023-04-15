@@ -1,0 +1,86 @@
+;2. Scrieţi un program care afişează primele n perechi de numere prime impare consecutive 
+;(n - număr impar citit de la tastatură). Exemplu: (3,5), (5,7), etc.
+
+;int n, a, b, c, contor, k;
+;a=b=1;
+;while(ct<=n){
+;	k=0;
+;	b=b+2;
+;	for(c=2; c<=(b/2); c++)
+;		if(b%c==0) k++;
+;	if(k=a){
+;	cout<<a<<" "<<b;
+;	a=b;
+;	contor++;
+;	}
+;}
+
+.data
+msg_citire_n:
+	.asciiz "n = "
+msg_afisare:
+	.asciiz "\nPerechile sunt:\n"
+msg_afisare_pereche:
+	.asciiz "\n(%d, %d)"
+	
+	.align 2
+para_msg_afisare:
+	.word msg_afisare
+para_afisare_pereche:
+	.word msg_afisare_pereche
+para_nr1:
+	.space 4
+para_nr2:
+	.space 4
+
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_n
+	jal InputUnsigned	;r1<-n
+	
+	addi r6, r0, 2		;r6=c=2
+	addi r3, r0, 1		;r3=a=1
+	addi r4, r0, 1		;r4=b=1
+	addi r5, r0, 2		;r5=2 - impartitor
+	div r8, r4, r5		;r8=r4/r5=b/2
+	addi r2, r1, 0		;r2=n, contor
+
+while:	
+	addi r7, r0, 0		;r7=k
+	addi r4, r4, 2		;b=b+2
+	
+	for:
+	div r9, r4, r6		;r9=r4/r6=b/c(b/2)
+	multu r10, r9, r6	;r10=catul*c 
+	sub r7, r4, r10		;r7=restul
+	beqz r7, while		;if(b%c==0) merge inapoi la while, nr nu este prim
+	addi r6, r6, 1		;c++
+	ble r6, r8, for		;cat timp c<=b/2
+
+;afisare pereche gasita	
+	sw para_nr1, r3
+	sw para_nr2, r4
+	addi r14, r0, para_msg_afisare
+	trap 5
+	addi r14, r0, para_afisare_pereche
+	trap 5
+add r3, r0, r4		;a=b
+subi r1, r1, 1		;n--
+bnez r1, while		;cat timp n!=0
+
+trap 0
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

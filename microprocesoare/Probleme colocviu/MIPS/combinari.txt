@@ -1,0 +1,71 @@
+.data
+nr_fact:
+	.asciiz "Dati numarul n= "
+gutzan:	.asciiz "dati k="		
+	.text
+	.globl main
+main:
+	subu	$sp, $sp, 32	# Stack frame is 32 bytes long
+	sw	$ra, 20($sp)	# Save return address
+	sw	$fp, 16($sp)	# Save old frame pointer
+	addu	$fp, $sp, 32	# Set up frame pointer
+
+	puts gutzan
+	geti	$t1
+	move $t2,$t1
+	puts nr_fact
+	geti $a0
+	sub $t1,$a0,$t1
+	jal	fact		# Call factorial function
+	mflo $t9
+	li $t1,0
+	move $a0,$t2
+	jal fact
+	mflo $t8
+	div $t9,$t8
+	la	$a0, $LC	# Put address of  string in $a0
+	li 	$v0, 4		# Put the cod of operation in v0
+	syscall			# Print string
+
+	mflo	$a0		# Save the result in a0
+	li	$v0, 1		# Put the cod of operation in v0
+	syscall			# Print value of factorial
+
+	lw	$ra, 20($sp)	# Restore return address
+	lw	$fp, 16($sp)	# Restore frame pointer
+	addu	$sp, $sp, 32	# Pop stack frame
+
+	done
+
+	.data
+$LC:	
+	.ascii "Combinari = "
+
+	.text
+fact:
+	subu	$sp, $sp, 32	# Stack frame is 32 bytes long
+	sw	$ra, 20($sp)	# Save return address
+	sw	$fp, 16($sp)	# Save old frame pointer
+	addu	$fp, $sp, 32	# Set up frame pointer
+
+	sw	$a0, 0($fp)	# Save argumentul (n)
+
+	lw	$2, 0($fp)	# Load n
+	bgt	$2,$t1,$L2	# Branch if n>0
+	li	$2, 1		# Return 1
+	j	$L1		# Jump to code to return
+
+$L2:
+	lw	$3, 0($fp)	# Load n
+	subu	$2, $3, 1	# Compute n-1
+	move	$a0, $2		# Move value to $a0
+	jal	fact		# Call factorial function
+
+	lw	$3, 0($fp)	# Load n
+	mul	$2, $2, $3	# Compute fact(n-1)*n
+
+$L1:				# Result in $2
+	lw	$ra, 20($sp)	# Restore $ra
+	lw	$fp, 16($sp)	# Restore $fp
+	addu	$sp, $sp, 32	# Pop stack
+	j	$ra		# Return to caller

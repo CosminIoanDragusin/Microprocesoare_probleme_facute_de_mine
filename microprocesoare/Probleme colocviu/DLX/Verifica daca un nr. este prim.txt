@@ -1,0 +1,75 @@
+;Verifica daca un nr. citit de la tastatura este prim
+
+;int n,d,divizori;
+;cin>>n;
+;//se determina daca numarul are divizori proprii
+;  for(d=2;d<=n/2;d++)
+;    {
+;        if(n%d==0) 
+;            divizori++;
+;    }
+;if(divizori==0)
+;    cout<<"Numarul este prim";
+;else
+;    cout<<"Numarul nu este prim";
+	
+	.data
+msg_citire_n:
+	.asciiz "n = "
+msg_afisare_da:
+	.asciiz "Nr. este prim!"
+msg_afisare_nu:
+	.asciiz "Nr. nu este prim!"
+
+	.align 2
+para_msg_da:
+	.word msg_afisare_da
+para_msg_nu:
+	.word msg_afisare_nu
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_n
+	jal InputUnsigned			;r1<-n
+	
+	add r2, r1, r0				;r2=n
+	jal test_prim				;r31=pc+1
+	bnez r6, prim				;r6=1 => nr prim
+neprim:
+	addi r14, r0, para_msg_nu
+	trap 5
+	j sfarsit
+prim:
+	addi r14, r0, para_msg_da
+	trap 5
+
+sfarsit:
+	trap 0
+
+;Procedura Prim
+;Primeste nr. de verificat in r2
+;Intoarce in r6 1 daca e prim; 0 in caz contrar
+test_prim:
+	addi r3, r0, 1		;r3<-d
+	addi r8, r0, 2
+	divu r7, r2, r8		;r7=n/2
+repeta:
+	addi r3, r3, 1		;d++
+	sge r15, r3, r7		;r15=1 cat timp d<=n/2
+	bez r15, gata_prim	;daca d=n/2 si restul nu a fost 0 => nr e prim
+	divu r4, r2, r3		;proc aflare rest
+	multu r5, r4, r3
+	subu r6, r2, r5			;r6=restul
+	beqz r6, gata_neprim	;daca r6=0 nr nu este prim
+	j repeta
+
+gata_neprim:
+	addi r6, r0, 0
+	j iesire
+gata_prim:
+	addi r6, r0, 1
+iesire:
+
+	jr r31				;revenire in main
+	

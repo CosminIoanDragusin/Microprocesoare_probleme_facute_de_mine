@@ -1,0 +1,60 @@
+#Program - 3' factor_1.s
+#calculul factorialului unui numar
+
+	.data
+nr_fact:
+	.asciiz "Dati numarul n= "
+	.text
+	.globl main
+main:
+	subu	$sp, $sp, 8	# Stack frame is 8 bytes long
+	sw	$ra, 4($sp)	# Save return address
+
+	puts	nr_fact
+	geti	$a0
+	jal	fact		# Call factorial function
+	
+	la	$a0, $LC	# Put address of  string in $a0
+	li 	$v0, 4		# Put the cod of operation in v0
+	syscall			# Print string
+
+	mflo	$a0		# Save the result in a0 
+				# - mul se obtine din mult urmat de transfer in $v0
+	li	$v0, 1		# Put the cod of operation in v0
+	syscall			# Print value of factorial
+
+	lw	$ra, 4($sp)	# Restore return address
+	addu	$sp, $sp, 8	# Pop stack frame
+	done
+
+	.data
+$LC:	
+	.ascii "Factorial = "
+
+	.text
+fact:
+	subu	$sp, $sp, 8	# Stack frame is 32 bytes long
+	sw	$ra, 4($sp)	# Save return address
+
+	sw	$a0, 0($sp)	# Save argumentul (n)
+
+	lw	$2, 0($sp)	# Load n
+	bgtz	$2, $L2	# Branch if n>0
+	li	$2, 1		# Return 1
+	j	$L1		# Jump to code to return
+
+$L2:
+	lw	$3, 0($sp)	# Load n
+	subu	$2, $3, 1	# Compute n-1
+	move	$a0, $2		# Move value to $a0
+	jal	fact		# Call factorial function
+
+	lw	$3, 0($sp)	# Load n
+	mul	$2, $2, $3	# Compute fact(n-1)*n
+
+$L1:				# Result in $2
+	lw	$ra, 4($sp)	# Restore $ra
+	addu	$sp, $sp, 8	# Pop stack
+	j	$ra		# Return to caller
+
+

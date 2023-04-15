@@ -1,0 +1,48 @@
+#Calculeaza media aritmetica a n nr citite de la tastatura
+	.data
+msg_citire_n:
+	.asciiz "n = "
+msg_citire_nr:
+	.asciiz "Introduceti numerele: "
+msg_afisare_medie:
+	.asciiz "Media aritmetica (cat, rest) = "
+n:
+	.space 4
+numere:
+	.space 100
+	.text
+	.globl main
+main:
+
+	puts msg_citire_n
+	geti $t0		#$t0<-n
+	la $t2, n
+	sw $t0, ($t2)
+
+	puts msg_citire_nr
+	
+	li $t2, 0		#t2<-suma
+	la $t1, numere		#t1<-adresa unde se vor memora
+citeste:
+	li $v0, 5
+#	syscall
+	add $t2, $t2, $v0
+	sw $v0, ($t1)
+	addi $t1, $t1, 4
+	li $t3, 1
+	sub $t0, $t0, $t3
+	bnez $t0, citeste 
+
+	la $t3, n
+	lw $t0, ($t3)
+	div $t2, $t0
+	mfhi $t0
+	mflo $t1
+	puts msg_afisare_medie
+	puti $t1
+	putc ','
+	puti $t0
+
+
+sfarsit:
+	done

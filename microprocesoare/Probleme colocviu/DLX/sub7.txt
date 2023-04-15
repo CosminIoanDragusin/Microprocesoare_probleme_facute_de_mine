@@ -1,0 +1,12 @@
+;int n, cifra, min=100 max=0;
+;cin >> n;
+;while (n != 0)
+;	{
+;		cifra = n % 10;
+;		if(cifra%2==0)
+			if(cifra>max) max=cifra;
+		else
+			if(cifra<min) max=cifra;
+;		n = n / 10;
+;	}
+;cout<<min<<max;

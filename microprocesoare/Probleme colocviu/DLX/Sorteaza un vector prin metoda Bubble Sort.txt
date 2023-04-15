@@ -1,0 +1,115 @@
+;Sorteaza un vector prin metoda Bubble Sort
+
+
+;   int a[100], n, i, k, t;
+;   cout<<"n="<<;
+;   cin>>n;
+;   for(i=0; i<n; i++)
+;		cin>>a[i];
+;   for(k=1; k<=n; k++)
+;      for(i=0; i<=n-1; i++)
+;           if(a[i]>a[i+1])
+;           {
+;              t=a[i];
+;              a[i]=a[i+1];
+;              a[i+1]=t;
+;           }
+          
+		   
+	.data
+msg_citire_n:
+	.asciiz "n = "
+msg_citire_elemente:
+	.asciiz "\nIntroduceti elementele!\n"
+msg_afisare_vector:
+	.asciiz "\nVectorul sortat este: "
+msg_citire_nr:
+	.asciiz "a[i] = "
+msg_afisare_element:
+	.asciiz "%d "
+	
+	.align 2
+para_citire_elemente:
+	.word msg_citire_elemente
+para_afisare_vector:
+	.word msg_afisare_vector
+para_afisare_element:
+	.word msg_afisare_element
+value_element:
+	.space 4
+n:
+	.space 4
+vector:
+	.space 100
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_n
+	jal InputUnsigned			;r1=n
+	sw n, r1
+	addi r2, r1, 0				;r2<-n
+
+	addi r14, r0, para_citire_elemente
+	trap 5
+
+	addi r3, r0, 0				;r3= for i=0
+	addi r4, r0, vector			;r4<-deplasament
+citeste:
+	addi r1, r0, msg_citire_nr	
+	jal InputUnsigned
+	sw (r4), r1					;punem elementele in vector
+	addi r4, r4, 4				;incrementam adresa pt urm element
+	addi r3, r3, 1				;i++
+	slt r15, r3, r2				;r15=1 daca r3<r2 = i<n
+	bnez r15, citeste			;cat timp i<n
+
+	jal bubblesort				;r31=pc+1
+	
+	addi r14, r0, para_afisare_vector
+	trap 5
+
+	addi r3, r0, 0				;r3=contor elemente
+	addi r4, r0, vector			;r4=deplasament
+afiseaza:
+	lw r5, (r4)					;r5=a[i]
+	sw value_element, r5		
+	addi r14, r0, para_afisare_element
+	trap 5
+	addi r4, r4, 4				;i++
+	addi r3, r3, 1				;i++
+	slt r15, r3, r2				;r15=1 daca i<n
+	bnez r15, afiseaza			;cat timp i<n
+
+sfarsit:
+	trap 0
+
+
+;Procedura Bubble Sort
+bubblesort:
+	addi r6, r0, 1			;k=1
+for1:
+	addi r7, r0, 0			;i=0
+	addi r8, r0, vector		;r8=prima poz in vect
+for2:
+	lw r9, (r8)				;r9=a[i]
+	lw r10, 4(r8)			;r10=a[i+1]
+	sgt r15, r9, r10		;r15=1 daca a[i]>a[i+1]
+	beqz r15,next			
+interschimbare:
+	sw (r8), r10
+	sw 4(r8), r9
+next:
+	addi r8, r8, 4			;r8= a doua poz din vector
+	addi r7, r7, 1			;i++
+	addi r10, r2, -1		;r10=n-1
+	slt r15, r7, r10		;r15=1 daca i<n-1
+	bnez r15, for2			;cat timp i<n-1 repeta
+
+	addi r6, r6, 1			;k++
+	slt r15, r6, r2			;r15=1 daca k<n
+	bnez r15, for1			;cat timp k<n
+
+	jr r31					;revenire in main
+
+	

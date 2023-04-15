@@ -1,0 +1,78 @@
+.data
+ mesaj1:
+   .asciiz "Dati cele 2 numere a="
+ mesaj2: 
+   .asciiz "\n b="
+ prime: 
+   .asciiz "\n numerele sunt prime\n"
+ nprime: 
+   .asciiz "\n numerele nu sunt prime"
+ .align 2
+nr1:
+ .space 4
+nr2:
+ .space 4
+
+
+
+.text
+  la $a0,mesaj1
+  li $v0,4
+  syscall
+ 
+  li $v0,5   #primul numar
+  syscall
+
+  sw $v0,nr1
+
+
+  la $a0,mesaj2
+  li $v0,4
+  syscall
+ 
+  li $v0,5   #al doilea numar
+  syscall
+
+  sw $v0,nr2
+
+#comparam cele doua numere in nr1 vom stoca maximul
+
+ lw $t0,nr1
+ lw $t1,nr2
+
+ slt $t3,$t1,$t2
+ bnez $t3, inversare
+ j cmmdc
+inversare:
+  sw $t1,nr1
+  sw $t0,nr2
+
+  lw $t0,nr1
+  lw $t1,nr2
+
+cmmdc:
+		rem $t3,$t0,$t1  ; restul imp lui t0 la t1
+  beqz $t3, afisare
+  
+  move $t3,$t0
+  move $t0,$t1
+  rem $t1,$t3,$t1
+  
+j cmmdc
+
+afisare:
+  beq $t1,1, etprime
+  j etnprime
+
+etprime:   
+  la $a0,prime
+  li $v0,4
+  syscall
+  j end
+
+etnprime:
+  la $a0,nprime
+  li $v0,4
+  syscall
+end:
+ done

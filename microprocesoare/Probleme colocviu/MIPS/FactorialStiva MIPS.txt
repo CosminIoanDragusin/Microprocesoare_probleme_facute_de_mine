@@ -1,0 +1,42 @@
+.data
+		numar:
+			.asciiz"numar n= "
+.text
+		puts numar
+		geti $a0           # $a0<=n
+	
+		sub $sp,$sp,8       # cadru de stiva
+		sw $ra,4($sp)
+		jal FACT
+		
+		mflo $a0
+		li $v0,1            #afisez factorialul
+		syscall
+		
+		lw $ra,4($sp)        # restaurez prima valoare $ra salvata pe stiva
+		add $sp,$sp,8       # golesc stiva  
+		#DONE
+		done
+		#.data
+		#.text
+		FACT:
+				sub $sp,$sp,8      #aloc spatiu in stiva   
+				sw $a0,0($sp)       #memorez "n-ul" curent
+				sw $ra,4($sp)      # memorez return address		
+				bgtz $a0,REPETA    # daca n>=1 repeta recursiv
+				
+				li $v0,1           # 0! =1
+				j EXIT					
+				
+				REPETA:
+								sub $a0,$a0,1
+								jal FACT
+				
+				lw $a0,0($sp)
+				mul $v0,$v0,$a0
+				
+				EXIT:
+						lw $ra,4($sp)					
+						add $sp,$sp,8    #refac stiva
+						j $ra            #ma intorc recursiv							
+				

@@ -1,0 +1,19 @@
+int N;
+cin>>N;
+
+int v[100]; 
+int i;
+for (i = 1; i <= N; i++) 
+        cin>>v[i];
+
+int cmmdc = v[1]; 
+for (i = 2; i <= N; i++){
+
+        int copieEL = v[i]; 
+        while (copieEL != cmmdc){
+
+                if (copieEL > cmmdc)
+                        copieEL = copieEL - cmmdc;
+                else if (copieEL < cmmdc)
+                        cmmdc = cmmdc - copieEL;
+        }

@@ -1,0 +1,126 @@
+;DLX
+;Nr n citit de la tastatura
+;Cate cifre sunt mai mici si cate sunt mai mari decat media aritmetica
+;Daca sunt egale cu media aritmetica le-am adunat in ambele parti
+
+;int n, cifra, min=100 max=0, media=0, ct=0, ct_mici=0, ct_mari=0;
+;cin >> n;
+;int copie_n=n;
+;while (n != 0)
+;	{
+;		cifra = n % 10;
+;		media = media +cifra;
+;		n = n / 10;
+;		ct++;
+;	}
+;media=media/ct;
+;n=copie_n
+;while (n != 0)
+;	{
+;		cifra=	n % 10;
+;		if(cifra<=media) ct_mici ++;
+;		if(cifra>=media) ct_mari ++;	
+;cout<<ct_mici<<ct_mari;
+
+
+; r1 = n
+; r2 = c
+; r3 = suma cifrelor + media aritmetica
+; r4 = contor pt nr cifrelor
+; r5 = 10
+; r6 = copie a lui n
+; r9 =copie a lui n
+; r8 =contor pt mai mici
+; r10 = contor pt mai mare 
+
+.data
+n: .asciiz "n="
+maimare: .asciiz "%d cifre mai mari decat media aritmetica  "
+maimic: .asciiz "%d cifre mai mici decat media aritmetica  "
+nrnegativ: .asciiz "numarul introdus este negativ"
+
+.align 2
+
+printMaiMic: 
+	.word maimic
+printMic: 
+	.space 4
+printMaiMare: 
+	.word maimare
+printMare: 
+	.space 4
+printNegativ:
+	.word nrnegativ
+	
+.text
+main:
+addi r1, r0, n
+jal InputUnsigned
+
+addi r3, r0, 0; suma=0
+addi r4, r0, 0
+addi r6, r1, 0 ;salvam in r6 nr citit
+;addi r9, r1, 0 ;salvam in r9 nr citit
+addi r5, r0, 10 ;r5=10
+;Test de pozitivitate
+sgt r15, r1, r0 ;daca n<0 seteaza r15=1, altfel r15=0
+beqz r15, negativ
+;Calcul medie aritmetica
+medieAritmetica:
+	addi r4, r4, 1  ;incrementam contorul
+	div r7, r6, r5  ;r7=n/10    C=D/I
+	multu r2, r5, r7 ;r2=I*C
+	sub r2, r6, r2 ;r2= restul (D-I*C) == cifra
+	add r3, r3, r2 ;adunam la suma
+	addi r6, r0, 0 	;r6=0
+	addi r6, r7, 0	;r6= n/10 = C altfel nu putem face calculele
+	
+	bnez r7, medieAritmetica ;daca n !=0 
+	
+div r3, r3, r4 ;r3= suma/contor => r3 = media aritmetica
+
+addi r6, r0, 0 ;r7=0
+addi r6, r1, 0 ;r7=numarul citit
+addi r2, r0, 0 ;cifra initiala = 0
+addi r8, r0, 0 ;contor pt nr mai mici decat MA
+addi r10, r0, 0 ;contor pentru numerele mai mari decat MA
+
+contorizare:
+	div r7, r6, r5 ;r7=n/10  C=D/I
+	multu r2, r5, r7  ;r2=I*C
+	sub r2, r6, r2 ;r2= restul (D-I*C) == cifra
+	sgt r14, r2, r3 ;daca r2>r3 avem 1 in r14
+	bnez r14, mare ;daca r14=1, cifra e mai mare decat MA
+mic:	
+	addi r8, r8, 1 ;contor cifre mai mici
+	seq r14, r2, r3 ;daca cifra = MA, adunam in ambele situatii
+	bnez r14, mare ;daca r14 =1 => ma==cifra =>adumam si la cont pt mai mare
+	j conditie
+
+mare:
+	addi r10, r10, 1 ;contor cifre mai mari
+
+conditie:
+	addi r6, r0, 0 	;r6=0
+	addi r6, r7, 0	;r6= n/10 = C altfel nu putem face calculele
+	bnez r7, contorizare;daca n !=0 
+	
+
+sw printMic, r8
+addi r14, r0, printMaiMic ;afisare cate cifre sunt mai mici
+trap 5 
+
+sw printMare, r10
+addi r14, r0, printMaiMare ;afisare cate cifre sunt mai mari
+trap 5 
+
+j gata
+
+negativ:
+	addi r14, r0, printNegativ
+	trap 5
+	j main ;salt neconditionat inapoi in main pentru recitire
+
+	
+gata: 
+	trap 0

@@ -1,0 +1,46 @@
+.data
+	numar1:
+		.asciiz"dati primul nr : "
+	
+		numar2:
+		.asciiz"dati al 2-lea nr: "
+
+.text
+	puts numar1
+	
+	li $v0,5
+	syscall
+	move $t0,$v0     #t0<=== primul nr
+	
+	puts numar2	
+	
+	li $v0,5
+	syscall
+	move $t1,$v0    # t1<== al 2-lea numar
+	
+	slt $t2,$t0,$t1 # t0<t1 => t2=1
+ bneq $t2, inversare
+	j calcul
+	
+	inversare:
+		move $t2,$t0
+		move $t0,$t1
+		move $t1,$t2
+		
+	calcul:
+		div $t2,$t0,$t1  # t2<--cat t0/t1
+		mfhi $t3         #t3<--restul
+		beqz $t3,afis   #daca restul e 0 se afiseaza ultimul rest nenul adica impartitorul
+		#deimpartitul<-- impatitor ;  impartitorul<--restul
+		move $t0,$t1
+		move $t1,$t3
+	bnez $t3,calcul
+	
+	afis:
+	move $a0,$t1
+	li $v0,1
+	syscall
+
+		
+		
+		

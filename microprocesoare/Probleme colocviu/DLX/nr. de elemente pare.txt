@@ -1,0 +1,63 @@
+	.data
+Prompt: 
+	.asciiz "Introduceti numarul de elemente n = "
+Prompt1: 
+	.asciiz "Introduceti elementul = "
+PrintfFormat1:
+	.asciiz "Nr de elemente pare este %d :\n"
+
+
+	.align 2
+PrintfPar1:
+	.word PrintfFormat1
+PrintfValue1:
+	.space 4
+
+PrintfErr1:
+	.word PrintfMesaj_err
+
+	.text
+	.global main
+	
+main:	addi 	r1,r0,Prompt
+	jal 	InputUnsigned
+	
+	sle 	r15,r1,r0
+	bnez	r15, mesaj_err
+	addi	r2,r1,0
+	addi    r6,r0,0
+
+loop:   beqz r2,par
+         addi    r1,r0,Prompt1
+	jal 	InputUnsigned
+	;addi r10,r0,r1
+        add r4,r0,r1
+        add r7,r0,r1
+        add r6,r0,2
+        div	r4, r4, r6		
+	multu	r5, r4, r6		
+
+	sub	r5, r7, r5		
+
+         addi r8,r0,1
+        sne r9,r5,r8
+        subi    r2,r2,1
+        beqz r9,loop
+        addi r3,r3,1
+        ;subi    r2,r2,1
+       	bnez    r2,loop	
+
+	j 	gata
+par: sw 	PrintfValue1,r3   
+	addi	r14,r0,PrintfPar1
+	trap    5
+
+mesaj_err:
+	sw      PrintfValue3,r6
+	addi    r14,r0,PrintfErr1
+	trap	5
+	j 	main
+
+
+gata:
+	trap	0

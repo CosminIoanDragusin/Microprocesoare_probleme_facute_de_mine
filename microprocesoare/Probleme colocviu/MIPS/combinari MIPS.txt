@@ -1,0 +1,93 @@
+.data
+ mesaj1:
+   .asciiz "Dati n="
+ mesaj2:
+   .asciiz "\n Dati k="
+ mesaj3:
+   .asciiz "\n Nr de combinari sunt "
+
+.text
+
+ la $a0, mesaj1
+ li $v0,4
+ syscall
+
+ li $v0,5
+ syscall
+ 
+ move $t0,$v0 #t0 va contine pe n
+
+
+ la $a0, mesaj2
+ li $v0,4
+ syscall
+
+ li $v0,5
+ syscall
+ 
+ move $t1,$v0 #t1 va contine pe k
+
+
+ li $t2,0
+ li $t4,1
+ li $t5,0
+
+factorial:   #k factorial
+
+ addi $t2,$t2,1 
+ addi $sp,$sp,-12
+ sw $fp,4($sp)
+ sw $ra 8($sp)
+ sw $t1,12($sp)
+ addi $fp,$sp,12
+
+ addi, $t1,$t1,-1
+ beq $t1,$t5, calcul
+
+jal factorial
+
+calcul:
+ lw $ra,8($sp)
+ lw $fp,4($sp)
+ lw $t3,12($sp)
+
+ addi $sp,$sp,12
+ addi $fp,$fp,12
+ 
+ mul $t4,$t4,$t3
+
+ addi $t2,$t2,-1
+ beqz $t2,rez
+j $ra    
+
+rez:
+ beqz $t5,factk
+ j afisare
+factk:
+ move $t6,$t4
+
+
+ li $t2,0
+ li $t4,1
+
+ sub $t5,$t0,$t3 #$t5=n-k
+  move $t1, $t0   #t1=n
+ 
+
+
+j factorial 
+
+
+
+afisare:
+  la $a0,mesaj3
+ li $v0,4 
+ syscall
+
+  div $t0,$t4,$t6
+  move $a0,$t0
+  li $v0,1
+  syscall
+
+end:
+ done 

@@ -1,0 +1,47 @@
+;Calculeaza suma cifrelor unui nr.
+
+;int n, s;
+;cin >> n;
+;while (n != 0)
+;	{
+;		s = s + n % 10; 
+;		n = n / 10; 
+;	}
+;cout << "Suma cifrelor lui n este: " << s;
+
+	.data
+msg_citire_n:
+	.asciiz "n = "
+msg_afisare_suma:
+	.asciiz "suma = %d"
+
+	.align 2
+para_afisare_suma:
+	.word msg_afisare_suma
+value_suma:
+	.space 4
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_n
+	jal InputUnsigned
+	addi r2, r1, 0		;r2<-n
+	
+	addi r3, r0, 10		;r3<-10
+	addi r4, r0, 0		;r4<-suma
+
+repeta:
+	div r5, r2, r3		;r5=nr/10	
+	mult r6, r5, r3		;proc aflare rest (div, mult, sub)	
+	sub r7, r2, r6		;r7<-cifra
+	addi r2, r5, 0		;r2<-nr/10
+	add r4, r4, r7		;suma+=cifra
+	bnez r2, repeta		;repeta atat timp cat n!=0
+
+	sw value_suma, r4	;afisare suma
+	addi r14, r0, para_afisare_suma
+	trap 5
+
+sfarsit:
+	trap 0

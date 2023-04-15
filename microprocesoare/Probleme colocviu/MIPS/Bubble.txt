@@ -1,0 +1,70 @@
+    .data
+d4:    .space 80
+d1:    .asciiz "Dati numarul de elemente : "
+d2:    .asciiz "Dati elementul :"
+d3:    .asciiz "Elementele sortate sunt"
+
+    .text
+__start: 
+# prompt for and read an integer
+	li $v0,4
+	la $a0,d1
+	syscall
+	li $v0,5
+	syscall
+	move $t3,$v0	# in $t3 numarul de elemente
+
+	move $t2,$t3	# se va folosi $t2 pe post de contor
+	la $a1,d4
+lop:	li $v0,4
+	la $a0,d2
+	syscall
+	li $v0,5	# read integer
+	syscall
+	sw $v0,($a1)
+	add $a1,$a1,4
+	sub $t2,$t2,1
+	beqz $t2,sort
+	j lop
+
+sort:	move $t2,$t3
+	move $t1,$t3	# $t2 si $t1 vor fi cele doua contoare
+et2:	la $a1,d4
+	la $a2,d4
+	add $a2,$a2,4
+
+	move $t1,$t3
+	li $a3,0	# $a3 folosit ca flag true
+	
+et1:	lw $a0,($a1)
+	lw $t0,($a2)
+	bgt $a0,$t0,schi
+et3:	add $a1,$a1,4
+	add $a2,$a2,4
+	sub $t1,$t1,1
+	bne $t1,1,et1
+
+	beqz $a3,afis
+	
+	j sort
+
+schi:	li $a3,1
+	move $t4,$a0
+	move $a0,$t0
+	move $t0,$t4
+	sw $a0,($a1)
+	sw $t0,($a2)
+	j et3
+
+afis:	move $t2,$t3	# se va folosi $t2 pe post de contor
+	la $a1,d4
+salt:	li $v0,1
+	lw $a0,($a1)
+	syscall
+	putc ' '
+	add $a1,$a1,4
+	sub $t2,$t2,1
+	beq $t2,0,gata
+	j salt
+
+gata:	done

@@ -1,0 +1,76 @@
+.data
+
+spatiu:
+.asciiz "   "
+enter:
+.asciiz "\n"
+d0:
+.asciiz "Perechi= "
+
+.text
+
+start:
+	la $a0,d0
+	li $v0,4
+syscall
+	li $v0,5
+syscall
+	add $t5,$v0,$v0
+	li $t6,0 
+	li $v0,2
+
+inceput:
+	bge $t6,$t5,end
+	move $t0,$v0
+	li $t1,2
+	add $t2,$t0,-1
+et:
+	bgt $t1,$t2,sfarsit
+	div $t0,$t1
+	mfhi $t3
+	beqz $t3,continua
+	add $t1,$t1,1
+j et
+
+sfarsit:
+	li $t7,2
+	div $t1,$t7
+	mfhi $t3
+	beqz $t3,continua
+	add $t6,$t6,1
+	div $t6,$t7
+	mfhi $t3
+	bnez $t3,r1
+	move $t9,$t1
+	sub $a1,$t9,$t8
+	li $a2,2`1
+	beq $a1,$a2,afisez
+	add $t6,$t6,-1    
+	move $t8,$t9      
+j continua
+
+afisez:
+	li $v0,1
+	move $a0,$t8
+syscall
+	li $v0,4
+	la $a0,spatiu
+syscall
+	li $v0,1
+	move $a0,$t9
+syscall
+	li $v0,4
+	la $a0,enter
+syscall
+	move $t8,$t9
+	li $t9,0
+	sub $t0,$t8,1
+j continua        
+
+r1:
+	move $t8,$t1
+continua:
+	add $v0,$t0,1
+j inceput
+
+end:done

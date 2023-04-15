@@ -1,0 +1,66 @@
+.data
+numar:
+			.asciiz"numar "
+spatiu:		
+			.asciiz": "	
+mesaj:
+				.asciiz"numar de elemente : "	
+.align 2
+		sir:
+				.space		80
+				
+.text
+		puts mesaj
+		li $v0,5
+		syscall			
+					
+#=================================================================================================================
+																																																												#citire elemente
+		move $t0,$v0                      # $t0<== numar elemente
+		li $t1,0
+		li $t2,0
+		citire:		
+				puts numar
+				puts spatiu
+				li $v0,5
+				syscall
+				sw $v0,sir($t1)
+				add $t1,$t1,4
+				add $t2,$t2,1
+				bgt $t0,$t2,citire 
+	
+#=================================================================================================================
+	sub $t1,$t0,1                      # $t1<=== n-1   i  for(i=n-1; i>=0; i--)
+		move $t2,0 				                    # $t2<=== 0     j       for(j=0; j<i+1; j++) if(sir[j]>sir[j+1]) interschimba
+
+		BUCLA_EXT:
+			li $t2,0            # se initializeaza de fiecare data deoarece pt fiecare i j ia si valoarea 0
+			li $t5,0       # se face pasul in memorie din 4 in 4; si se pleaca tot de la primul element 
+							
+							BUCLA_INT:
+											lw $t3,sir($t5)
+											lw $t4,sir+4($t5)
+											ble $t3,$t4,no_swap
+											
+											#interschimbare:
+											sw $t4,sir($t5)
+											sw $t3,sir+4($t5)
+											
+											no_swap:
+													add $t2,$t2,1
+													add $t5,$t5,4
+							blt $t2,$t1,BUCLA_INT 
+		sub $t1,$t1,1
+		bge $t1,1,BUCLA_EXT       # t1 merge de la n-1 downto 0
+	#===================================================================================================================
+																																																											#afisare elemente		
+		li $t1,0
+		li $t2,0			
+		afisare:
+				lw $a0,sir($t1)
+				li $v0,1
+				syscall
+				puts spatiu
+				add $t1,$t1,4
+				add $t2,$t2,1				
+				bgt $t0,$t2,afisare

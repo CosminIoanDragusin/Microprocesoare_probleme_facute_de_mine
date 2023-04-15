@@ -1,0 +1,58 @@
+;Calculeaza cmmmdc a 2 nr citite de la tastatura
+;while(a!=b)
+;	if(a > b) a = a-b;
+;	else b = b - a
+
+	.data
+msg_citire_a:
+	.asciiz "\na = "
+msg_citire_b:
+	.asciiz "b = "
+msg_afisare_cmmdc:
+	.asciiz "\ncmmdc(a, b) = %d"
+
+	.align 2
+para_afisare_cmmdc:
+	.word msg_afisare_cmmdc
+value_cmmdc:
+	.space 4
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_a
+	jal InputUnsigned
+	add r2, r1, 0				;r2<-a
+
+	addi r1, r0, msg_citire_b
+	jal InputUnsigned
+	add r3, r1, 0				;r3<-b
+
+	jal cmmdc					;r31=pc+1
+	
+	sw value_cmmdc, r4			;salvam cmmdc pt afisare
+	addi r14, r0, para_afisare_cmmdc
+	trap 5
+
+sfarsit:
+	trap 0
+
+;Cmmdc
+;Intoarce rez in r4
+cmmdc:
+
+repeta:
+	sgt r15, r2, r3			;r15=1 daca r2>r3, a>b
+	beqz r15, else			;a<b sare la else
+	sub r2, r2, r3			;a=a-b
+	j next
+else:
+	sub r3, r3, r2			;b=b-a
+next:
+	sne r15, r2, r3			;r15=1 daca a!=b
+	bnez r15, repeta		;repeta cat timp a!=b
+
+	addi r4, r2, 0			;r4=cmmdc
+
+	jr r31					;sare inapoi in main
+	

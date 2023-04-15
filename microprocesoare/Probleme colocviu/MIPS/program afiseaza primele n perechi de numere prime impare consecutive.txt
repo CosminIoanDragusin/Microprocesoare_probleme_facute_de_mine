@@ -1,0 +1,91 @@
+#Scrieti un program care afiseaza primele n perechi de numere prime impare consecutive
+
+#int n, a, b, c, ct, k;
+#a=b=1;
+#while(ct<=n){
+#	k=0;
+#	b=b+2;
+#	for(c=2; c<=(b/2); c++)
+#		if(b%c==0) k++;
+#	if(k=0&&a>1){
+#	cout<<a<<" "<<b;
+#	a=b;
+#	contor++;
+#	}
+#}
+
+	.data
+plus:
+	.asciiz " + "
+enter:
+	.asciiz "\n"
+msg1:
+	.asciiz "nr. perechi= "
+	
+	.text
+start:
+	la $a0, msg1      #afisare mesaj
+	li $v0, 4
+	syscall
+	
+	li $v0, 5         #v0=n
+	syscall
+	
+	add $t5, $v0, $v0 	#nr de numere prime
+	li $t6, 0         	#t6=ct
+	li $v0, 2			#v0=c
+et1:
+	bge $t6, $t5, end	#daca ct>n sari la end
+	move $t0, $v0		#
+	li $t1, 2
+	add $t2, $t0, -1
+et2:
+	bgt $t1, $t2, sf
+	div $t0, $t1
+	mfhi $t3
+	beqz $t3, continua
+	add $t1, $t1, 1
+	j et2
+
+sf:
+	li $t7, 2
+	div $t1, $t7
+	mfhi $t3
+	beqz $t3, continua
+	add $t6, $t6, 1
+	div $t6, $t7
+	mfhi $t3
+	bnez $t3, r1
+	move $t9, $t1
+	sub $a1, $t9, $t8
+	li $a2, 2
+	beq $a1, $a2, afisare
+	add $t6, $t6, -1    
+	move $t8, $t9      
+	j continua
+	
+afisare:
+	li $v0,1
+	move $a0, $t8
+	syscall
+	li $v0, 4
+	la $a0, plus
+	syscall
+	li $v0,1
+	move $a0, $t9
+	syscall
+	li $v0, 4
+	la $a0, enter
+	syscall
+	move $t8, $t9
+	li $t9, 0
+	sub $t0, $t8, 1
+	j continua         
+r1:
+    move $t8, $t1
+
+continua:
+	add $v0, $t0, 1
+	j et1
+
+end:done

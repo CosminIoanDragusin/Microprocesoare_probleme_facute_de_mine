@@ -1,0 +1,74 @@
+.data
+msg:	
+	.asciiz 'PROGRAMUL CALCULEAZA POLINOMUL LUI CEBISEV\nIntroduceti n si x:'
+afisareRezultat:
+	.asciiz 'T(n,x)= '		
+.text
+	.globl main
+main : 
+	subu $sp,$sp,20		#se pastreaza adresa de revenire in programul principal
+	sw $ra,16($sp)
+	sw $fp,12($sp)		# se pastreaza pe stiva indicatorul de cadru cu 
+						# valoarea din momentul inceperii executiei programului
+	addu $fp,$sp,20		# se determina indicatorul de cadru
+	puts msg		
+	li $v0,5			#se citeste n de la tastatura
+	syscall				
+	move $a0,$v0
+	li $v0,5			#se citeste x de la tastatura
+	syscall				
+	move $a1,$v0
+	jal cebisev			#jump si salvare legatura la cebisev	
+	move $t0, $v0		#salvez T(n,x) in $t0
+	li $a0,afisareRezultat		
+	li $v0,4			#afisare mesaj
+	syscall
+	move $a0, $t0		
+	li $v0,1			#afisare T(n,x)
+	syscall
+	lw $ra,16($sp)		# se reface adresa de revenire din subrutina 
+	lw $fp,12($sp)		# se reface indicatorul de cadru
+	addu $sp,$sp,20		# se reface indicatorul de stiva
+	done
+#punem functia recursiva dupa directiva done. In acest fel, functia devine o zona separata
+#de cod, fiind executata numai cand este apelata (cu jal <=> call). Simulam in acest fel
+#directiva proc din asamblare
+cebisev:
+	subu $sp,$sp,16		#stiva ocupa 16 locatii, adica 4 cuvinte (ra, fp, a0, v0 - rezultatul lui 2T(n-2,x))
+	sw $ra,12($sp)
+	sw $fp,8($sp)
+	addu $fp,$sp,16
+	sw $a0,0($fp)		#se salveaza pe stiva $a0 (parametrul n al functiei)
+	#sw $a1,4($fp)		#nu are rost sa salvam pe stiva $a1 (parametrul x al functiei)
+	lw $v0,0($fp)		#se incarca in $v0 parametrul n (adica pe $a0)
+	bgt $v0, 1, condSfarsitNeindeplinita	#daca $v0 > 1 (adica n # 0 si 1) treci la condSfarsitNeindeplinita
+	bnez $v0, caz1		#$v0 poate fi 0 sau 1
+caz0:
+	li $v0,1			#$v0 = 1 (adica T(0,x) = 1)
+	j sfarsit			#sari la sfarsit
+caz1:
+	move $v0, $a1		#$v0 = x (adica T(1,x) = x)
+	j sfarsit			#sari la sfarsit	
+condSfarsitNeindeplinita:
+	lw $v1,0($fp)		#se incarca in $v1 parametrul n
+	subu $v0,$v1,2		#$v0 = $v1 - 2 (adica $v0 = n-2)		
+	move $a0,$v0		#$a0 = $v0 ( = n-2, adica se pregateste parametrul n al functiei)
+	jal cebisev			#apel functie (T(n-2,x)) => in $v0 am T(n-2,x)
+	lw $a0, 0($fp)		
+	mul $v0, $v0, 2		#$v0 = 2T(n-2,x)
+	sw $v0, 4($fp)		#salvam temporar valoarea
+	lw $v1,0($fp)		#se incarca in $v1 parametrul n
+	subu $v0,$v1,1		#$v0 = $v1 - 1 (adica $v0 = n-1)
+	move $a0,$v0		#$a0 = $v0 ( = n-1, adica se pregateste parametrul n al functiei)
+	jal cebisev		
+	lw $t0, 4($fp)
+	sub $v0, $t0, $v0	#$v0 = 2T(n-2,x) - T(n-1,x)
+sfarsit:
+	lw $ra,12($sp)		#se reface adresa de revenire din subrutina
+	lw $fp,8($sp)		#se reface indicatorul de cadru	
+	addu $sp,$sp,16		#se reface indicatorul de stiva
+	j $ra				#revenire din procedura (j $ra <=> ret)
+
+	
+	
+	

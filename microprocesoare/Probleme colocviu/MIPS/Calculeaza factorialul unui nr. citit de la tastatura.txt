@@ -1,0 +1,68 @@
+#Calculeaza factorialul unui nr. citit de la tastatura
+#folosind apeluri recursive.
+
+.data
+msg1:
+	.asciiz "Introduceti numarul: "
+msg2:
+	.asciiz "fact= "
+
+.text
+.globl main
+main:
+li $v0, 4           #afisare mesaj
+la $a0, msg1
+syscall
+
+li $v0, 5           #citire intreg
+syscall
+
+move $a0, $v0
+	
+subu $sp, $sp, 12	#determinare cadru
+sw $ra, 8($sp)		#salvare adresa revenire
+sw $fp, 4($sp)		#salvare indic. cadru
+addu $fp, $sp, 12	#determinare indc cadru
+
+	
+jal factorial
+addu $sp, $sp, 12
+	
+li $v0, 4
+la $a0, msg2
+syscall
+move $a0, $v1
+li $v0, 1
+syscall
+
+sfarsit:
+done
+	
+#Proc. recursiva factorial
+#Primeste arg in $a0
+#Transmite rezultatul in $v1
+factorial:
+	subu $sp, $sp, 12
+	sw $ra, 8($sp)
+	sw $fp, 4($sp)
+	sw $a0, ($sp)
+	addu $fp, $sp, 12
+
+	lw $v1, ($sp)
+	bgtz $v1, continua
+	li $v1, 1	
+	j sfarsit_recursivitate
+continua:
+	subu $a0, $v1, 1
+	jal factorial
+	#intoarcere din rec
+	lw $t0, ($sp)
+	mul $v1, $v1, $t0	
+
+sfarsit_recursivitate:
+	lw $ra, 8($sp)
+	lw $fp, 4($sp)
+	addu $sp, $sp, 12
+	
+	jr $ra
+

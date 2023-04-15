@@ -1,0 +1,67 @@
+	.data
+nr_fact:
+	.asciiz "Dati numarul n= "
+mesaj:
+              .asciiz "dati k="
+	.text
+	.globl main
+main:
+
+	puts	nr_fact
+	geti	$a0             # in a0 am n 
+	move $t4,$a0
+	puts      mesaj 
+                 geti       $t0            # t0 am k
+                 move $a0,$t4
+                 li  $t1,1
+
+                 	subu     $t0,$t0,$t1 
+	subu      $a0,$a0,$t0  
+             
+	jal     aranj		# Call aranjamente function
+	
+	la      $a0, $LC	                  # Put address of  string in $a0
+	li       $v0, 4		 # Put the cod of operation in v0
+	syscall			 # Print string
+
+	mflo   $a0	                  	# Save the result in a0 
+				# - mul se obtine din mult urmat de transfer in $v0
+              
+	li      $v0, 1		# Put the cod of operation in v0
+	syscall			# Print value of aranjamente
+
+
+	done
+
+	.data
+$LC:	
+	.ascii "\n Aranjamente = "
+
+	.text
+aranj:
+	subu	$sp, $sp, 8	# Stack frame is 32 bytes long
+	sw	$ra, 4($sp)	# Save return address
+
+            
+	sw	$a0, 0($sp)	# Save argumentul (n)
+	
+
+	lw	$2, 0($sp)	# Load n
+	ble	$2, $t4, $L2	              # Branch if n>0
+	li	$2, 1		# Return 1
+	j	$L1		# Jump to code to return
+
+$L2:
+	lw	$3, 0($sp)	# Load n
+	addu	$2, $3, 1		# Compute n-1
+	move	$a0, $2		# Move value to $a0
+#              beq                                         	
+              jal	aranj		# Call factorial function
+
+	lw	$3, 0($sp)	# Load n
+	mul	$2, $2, $3	# Compute fact(n-1)*n
+
+$L1:				# Result in $2
+	lw	$ra, 4($sp)	# Restore $ra
+	addu	$sp, $sp, 8	# Pop stack
+	j	$ra		# Return to caller

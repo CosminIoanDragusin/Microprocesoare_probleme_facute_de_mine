@@ -1,0 +1,46 @@
+;Sa se inverseze un nr. citit de la tastatura
+
+;int n, inv=1;
+;cin >> n;
+;while (n != 0)
+;	{
+;		inv = inv * 10 + n % 10; 
+;		n = n / 10; 
+;	}
+
+	.data
+msg_citire_nr:
+	.asciiz "\nn = "
+msg_afisare_nr:
+	.asciiz "Inversul este = %d"
+
+	.align 2
+para_afisare_nr:
+	.word msg_afisare_nr
+value_nr:
+	.space 4
+
+	.text
+	.global main
+main:
+	addi r1, r0, msg_citire_nr
+	jal InputUnsigned
+	addi r2, r1, 0		;r2<-n
+	
+	addi r3, r0, 10		;r3<-10
+	addi r4, r0, 0		;r4<-nr invers
+repeta:
+	div r5, r2, r3		;cele trei op pt a obtine restul
+	mult r6, r3, r5		
+	sub r7, r2, r6		;r7<-restul
+	addi r2, r5, 0		;r2<-r2/10 (catul)
+	mult r4, r4, r3		;inv*10
+	add r4, r4, r7		;inv+restul
+	bnez r2, repeta		;repeta pana cand n!=0
+
+	sw value_nr, r4		;afisare invers
+	addi r14, r0, para_afisare_nr
+	trap 5
+
+sfarsit:
+	trap 0
